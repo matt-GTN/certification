@@ -1,0 +1,16 @@
+Compliance Area,Requirement Description,Compliance Status (Yes/No),Notes/Action Plan
+GDPR - Data Processing Principles,"Ensure data is processed lawfully, fairly, and transparently.",Yes,Implement centralized logging for all data processing.
+GDPR - User Rights,"Users must be able to access, modify, or delete their data upon request.",Partial,Automate DSAR fulfillment across all data silos.
+GDPR - Consent Management,"Obtain explicit, informed consent before processing personal data.",Yes,Maintain a global Consent Management Platform (CMP).
+GDPR - Data Breach Notification,Notify supervisory authority of data breaches within 72 hours.,Yes,Establish a dedicated Incident Response Team for data.
+GDPR - Data Protection Officer,Appoint a Data Protection Officer for monitoring compliance.,Yes,DPO role is defined in the leadership chart.
+CCPA - Data Sale Opt-out,Provide a clear opt-out mechanism for the sale of personal data.,Yes,"Add ""Do Not Sell My Info"" to all user interfaces."
+CCPA - User Access and Deletion Requests,Allow users to request access to or deletion of their data.,Partial,Integrate CCPA requests with the GDPR DSAR system.
+CCPA - Non-discrimination for Exercising Rights,Ensure no discrimination against users for exercising their CCPA rights.,Yes,Conduct regular audits of the premium/free logic.
+PCI-DSS - Secure Network and Systems,Ensure a secure network infrastructure and firewall protection.,Yes,Quarterly penetration testing and firewall audits.
+PCI-DSS - Protect Cardholder Data,Protect stored cardholder data using encryption and secure storage.,Yes,Use AES-256 encryption and tokenization for payments.
+PCI-DSS - Maintain Vulnerability Management Program,Maintain systems for protection against malware and vulnerabilities.,Yes,Deploy endpoint protection and automatic patching.
+PCI-DSS - Implement Strong Access Control Measures,Limit access to cardholder data to authorized personnel only.,Yes,"Enforce MFA and ""principle of least privilege""."
+PCI-DSS - Regularly Monitor and Test Networks,Implement systems to regularly test security measures and procedures.,Yes,Maintain real-time SIEM monitoring for unauthorized access.
+PCI-DSS - Information Security Policy,Maintain an updated information security policy for all personnel.,Yes,Annual mandatory security training and policy review.
+,,,

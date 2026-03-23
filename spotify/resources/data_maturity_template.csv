@@ -1,0 +1,10 @@
+Dimension,Current Level (1-5),Comments (Strengths/Weaknesses),Action Plan (For Improvement)
+Data Governance,2,Fragmented approach; silos in Marketing/Product.,Establish a Centralized Data Governance Committee.
+Data Quality,3,Strong for recommendations but inconsistent across silos.,Implement standardized data cleansing and validation tools.
+Data Architecture,3,Sophisticated (Lakes/Cloud) but siloed.,Create a unified data catalog to break down silos.
+Compliance (GDPR; CCPA; etc.),3,Basic compliance processes in place; lacks global consistency.,Develop automated compliance workflows and global standards.
+Data Usage & Accessibility,4,Analytics-driven culture but hindered by access bottlenecks.,Self-service data platform with role-based access control.
+Data Security,4,Encryption and secure storage in place (PCI-DSS influence).,Regular automated security audits and anonymization.
+Data Literacy,4,Data-driven decision making is culturally embedded.,Mandatory DG training for all departments.
+Data Integration,2,Significant silos between Marketing; Engineering; etc.,Implement an API-first integration strategy.
+Analytics & BI,5,Advanced ML (Discover Weekly); real-time insights.,Leverage AI to automate data quality and governance.

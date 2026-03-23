@@ -1,0 +1,38 @@
+# ========================
+# OS
+# ========================
+.DS_Store
+Thumbs.db
+
+# ========================
+# IDE / Outils
+# ========================
+.idea/
+.vscode/
+.obsidian/
+
+# ========================
+# fraud_detection - Python / Docker / Airflow
+# ========================
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Environnement (credentials)
+.env
+
+# Données volumineuses
+fraud_detection/data/fraudTest.csv
+
+# Logs Airflow
+fraud_detection/logs/
+
+# Archive (documents de travail internes)
+fraud_detection/archive/
