@@ -14,31 +14,26 @@ flowchart TD
         Web[SDKs Web]
         ExtServices[Services Externes]
     end
-
     subgraph Ingestion ["Ingestion"]
         LB[Load Balancer]
         Gateway[API Gateway]
         Kafka[Apache Kafka]
     end
-
     subgraph OLTP_System ["OLTP"]
         Postgres[(PostgreSQL Cluster)]
         Replica[(Réplicas de Lecture)]
         Postgres ==> Replica
     end
-
     subgraph NoSQL_System ["NoSQL"]
         MongoDB[(MongoDB Cluster)]
         MongoShards[(Shards)]
         MongoDB --- MongoShards
     end
-
     subgraph Processing ["Traitement"]
         Debezium[Debezium CDC]
         Spark_Stream[Spark Streaming\nCouche Vitesse]
         Spark_Batch[Spark / dbt\nCouche Batch]
     end
-
     subgraph OLAP_System ["OLAP"]
         Snowflake[(Snowflake)]
         DataMart_Revenue[Data Mart Revenus]
@@ -46,13 +41,11 @@ flowchart TD
         Snowflake ==> DataMart_Revenue
         Snowflake ==> DataMart_Fraud
     end
-
     subgraph Serving ["Service"]
         Redis[(Cache Redis)]
         ML_Serving[ML Inférence]
         BI_Tool[Tableau / Looker]
     end
-
     API ==> LB ==> Gateway ==> Postgres
     API ==> LB ==> Gateway ==> Kafka
     Mobile ==> Kafka
@@ -68,18 +61,22 @@ flowchart TD
     Spark_Batch == Données transformées ==> Snowflake
     Spark_Stream -.->|Agrég. temps réel| Redis
     Snowflake ==> BI_Tool
-
     classDef source fill:#25dbe0,stroke:#333,stroke-width:2px,color:#fff
     classDef process fill:#a329de,stroke:#333,stroke-width:2px,color:#fff
     classDef core fill:#272aff,stroke:#333,stroke-width:2px,color:#fff
     classDef output fill:#f79645,stroke:#333,stroke-width:2px,color:#fff
-
     class API,Mobile,Web,ExtServices source
     class LB,Gateway,Kafka,Debezium,Spark_Stream,Spark_Batch process
     class Postgres,Replica,MongoDB,MongoShards,Snowflake,DataMart_Revenue,DataMart_Fraud core
     class Redis,ML_Serving,BI_Tool output
-
-    linkStyle default stroke:#333,stroke-width:3px
+    linkStyle default stroke:#888780,stroke-width:3px
+    style Sources fill:#2e2e2c,stroke:#4a4a46,color:#c2c0b6
+    style Ingestion fill:#2e2e2c,stroke:#4a4a46,color:#c2c0b6
+    style OLTP_System fill:#2e2e2c,stroke:#4a4a46,color:#c2c0b6
+    style NoSQL_System fill:#2e2e2c,stroke:#4a4a46,color:#c2c0b6
+    style Processing fill:#2e2e2c,stroke:#4a4a46,color:#c2c0b6
+    style OLAP_System fill:#2e2e2c,stroke:#4a4a46,color:#c2c0b6
+    style Serving fill:#2e2e2c,stroke:#4a4a46,color:#c2c0b6
 ```
 
 ---

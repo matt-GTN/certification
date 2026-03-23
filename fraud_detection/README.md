@@ -5,27 +5,27 @@ Ce projet est une infrastructure complète de détection de fraude en temps rée
 ## Installation rapide
 
 1.  **Environnement Conda** :
-    ```bash
+```bash
     conda create -n fraud_detection python=3.10 -y
     conda activate fraud_detection
     pip install -r requirements.txt
-    ```
+```
 
 2.  **Configuration de la base de données Neon** :
     - Créer un projet sur [neon.tech](https://neon.tech)
     - Copier `.env.example` vers `.env` et renseigner vos propres credentials :
-    ```bash
+```bash
     cp .env.example .env
     ```
     - Exécuter le schéma initial dans la console SQL de Neon :
     ```bash
     psql $DATABASE_URL -f database/init.sql
-    ```
+```
 
 3.  **Lancement de l'infrastructure (Docker)** :
-    ```bash
+```bash
     docker-compose up -d
-    ```
+```
     Cela démarre :
     - **Airflow Webserver** sur le port `8081` (identifiants : admin / admin)
     - **Airflow Scheduler** pour l'orchestration des DAGs
@@ -41,7 +41,7 @@ Ce projet est une infrastructure complète de détection de fraude en temps rée
     - Le DAG `rapport_quotidien` s'exécute automatiquement chaque matin à 8h
 
 5.  **Execution manuelle (sans Airflow)** :
-    ```bash
+```bash
     # Charger les variables d'environnement
     source .env
 
@@ -56,7 +56,7 @@ Ce projet est une infrastructure complète de détection de fraude en temps rée
 
     # Lancer le tableau de bord
     streamlit run src/app/main.py
-    ```
+```
 
 ## Architecture
 
