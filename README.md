@@ -13,6 +13,7 @@ certification/
 ├── spotify/          # Bloc 1 - Gouvernance des données
 ├── stripe/           # Bloc 2 - Architecture des données
 ├── fraud_detection/  # Bloc 3 - Pipelines de données
+├── delay-forecast/   # Bloc 4 - Solutions d'IA
 └── CERTIFICATION.md  # Details de la certification
 ```
 
@@ -52,6 +53,18 @@ Infrastructure complète de détection de fraude en temps réel, utilisant **Tab
 
 ---
 
+### Bloc 4 - Solutions d'IA : Delay Forecast
+
+POC MLOps de prédiction de retards de transports en commun (Stockholm) en fonction de contextes externes — météo, jours fériés, temporalité. Couvre l'intégralité du cycle de vie ML : ingestion, ETL, entraînement, versioning, serving et monitoring.
+
+**Stack** : Python, Docker, Airflow, MLflow, FastAPI, Evidently, Neon PostgreSQL, AWS S3, Streamlit
+
+**Livrables** : Code source, architecture, video de démonstration.
+
+→ [Voir le projet](delay-forecast/)
+
+---
+
 ## Blocs de compétences
 
 | Bloc | Intitulé | Projet | Durée examen |
@@ -59,7 +72,7 @@ Infrastructure complète de détection de fraude en temps réel, utilisant **Tab
 | 1 | Gouvernance des données | Spotify | 30 min |
 | 2 | Architecture des données | Stripe | 20 min |
 | 3 | Pipelines de données | Fraud Detection | 20 min |
-| 4 | Solutions d'IA | Final Project | 15 min |
+| 4 | Solutions d'IA | Delay Forecast | 15 min |
 
 ---
 
