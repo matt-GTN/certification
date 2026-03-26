@@ -1,0 +1,60 @@
+# Secrets
+.env
+
+# Données locales (restent sur disque, hors du git)
+data/
+models/
+mlruns/
+mlruns_artifacts/
+mlartifacts/
+mlflow_data/
+
+# Fichiers binaires / artefacts
+*.zip
+*.pb
+*.gz
+*.parquet
+*.joblib
+*.pkl
+*.models
+*.log
+test.db
+logs/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Private
+docs/private/
+
+# Coverage
+.pytest_cache/
+.coverage
+htmlcov/

@@ -43,3 +43,24 @@ PRESENTATION_EXEMPLE.md
 PRESENTATION_FRAUD_DETECTION.md
 PRESENTATION_STRIPE.md
 LIVRABLES FRAUD DETECTION.md
+RESTANT A FAIRE.md
+
+# ========================
+# delay-forecast
+# ========================
+
+# Credentials
+delay-forecast/.env
+
+# MLflow — base SQLite et artefacts (binaires volumineux)
+delay-forecast/mlflow_data/mlflow.db
+delay-forecast/mlflow_data/artifacts/
+delay-forecast/mlruns_artifacts/
+
+# Données brutes (JSON / Parquet)
+delay-forecast/data/S3/
+delay-forecast/data/*.json
+delay-forecast/data/*.parquet
+
+# Notebooks checkpoints
+delay-forecast/exploration/.ipynb_checkpoints/
