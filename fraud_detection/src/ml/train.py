@@ -57,7 +57,23 @@ def train_model():
     df['hour'] = df['timestamp'].dt.hour
     df['day_of_week'] = df['timestamp'].dt.dayofweek
 
-    features = ['amount', 'category', 'hour', 'day_of_week']
+    # Features comportementales par client (sans utiliser le label → pas de leakage)
+    client_stats = df.groupby('client_id').agg(
+        client_tx_count=('amount', 'count'),
+        client_avg_amount=('amount', 'mean'),
+    ).reset_index()
+    df = df.merge(client_stats, on='client_id', how='left')
+    df['client_amount_ratio'] = df['amount'] / (df['client_avg_amount'] + 1e-6)
+
+    # Features par marchand
+    merchant_stats = df.groupby('merchant_id').agg(
+        merchant_tx_count=('amount', 'count'),
+    ).reset_index()
+    df = df.merge(merchant_stats, on='merchant_id', how='left')
+
+    features = ['amount', 'category', 'hour', 'day_of_week',
+                'client_tx_count', 'client_avg_amount', 'client_amount_ratio',
+                'merchant_tx_count']
     X = df[features].copy()
     y = df['is_fraud'].astype(int)
 
@@ -67,12 +83,18 @@ def train_model():
 
     # Normalisation des features numériques
     scaler = StandardScaler()
-    numeric_features = ['amount', 'hour', 'day_of_week']
+    numeric_features = ['amount', 'hour', 'day_of_week',
+                        'client_tx_count', 'client_avg_amount', 'client_amount_ratio',
+                        'merchant_tx_count']
     X[numeric_features] = scaler.fit_transform(X[numeric_features])
 
-    # Séparation entraînement / test (stratifié)
-    X_train, X_test, y_train, y_test = train_test_split(
+    # Séparation entraînement / validation / test (stratifié)
+    # Val sert à optimiser le seuil, test sert à évaluer le modèle final
+    X_train, X_temp, y_train, y_temp = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
+    )
+    X_val, X_test, y_val, y_test = train_test_split(
+        X_temp, y_temp, test_size=0.5, random_state=42, stratify=y_temp
     )
 
     # Échantillonnage stratifié enrichi en fraudes
@@ -114,20 +136,30 @@ def train_model():
     clf = TabPFNClassifier(n_estimators=8)
     clf.fit(X_train_balanced, y_train_balanced)
 
-    # Évaluation sur le jeu de test (non rééquilibré, reflète la distribution réelle)
-    MAX_EVAL = 10000
-    if len(X_test) > MAX_EVAL:
-        X_eval = X_test.iloc[:MAX_EVAL]
-        y_eval = y_test.iloc[:MAX_EVAL]
-    else:
-        X_eval = X_test
-        y_eval = y_test
+    # Limite API TabPFN : 1000 échantillons max par requête d'inférence
+    MAX_EVAL = 1000
 
-    print(f"Évaluation en cours ({len(X_eval)} échantillons)...")
+    def stratified_sample(X, y, n, random_state=42):
+        """Sous-échantillonnage stratifié pour respecter la limite API."""
+        if len(X) > n:
+            X_s, _, y_s, _ = train_test_split(
+                X, y, train_size=n, random_state=random_state, stratify=y
+            )
+            return X_s, y_s
+        return X, y
+
+    # Optimisation du seuil sur le jeu de VALIDATION (pas de leakage)
+    X_val_s, y_val_s = stratified_sample(X_val, y_val, MAX_EVAL)
+    print(f"Optimisation du seuil sur {len(X_val_s)} échantillons de validation "
+          f"(dont {y_val_s.sum()} fraudes)...")
+    y_proba_val = clf.predict_proba(X_val_s)[:, 1]
+    optimal_threshold = find_optimal_threshold(y_val_s, y_proba_val, min_recall=0.75)
+
+    # Évaluation finale sur le jeu de TEST (non vu pendant l'optimisation)
+    X_eval, y_eval = stratified_sample(X_test, y_test, MAX_EVAL)
+    print(f"Évaluation finale sur {len(X_eval)} échantillons de test "
+          f"(dont {y_eval.sum()} fraudes)...")
     y_proba = clf.predict_proba(X_eval)[:, 1]
-
-    # Recherche du seuil optimal (recall minimum 75% sur la classe fraude)
-    optimal_threshold = find_optimal_threshold(y_eval, y_proba, min_recall=0.75)
     y_pred_optimized = (y_proba >= optimal_threshold).astype(int)
 
     # Rapport avec seuil par défaut (0.5)
@@ -135,8 +167,8 @@ def train_model():
     print("\n--- Seuil par défaut (0.5) ---")
     print(classification_report(y_eval, y_pred_default))
 
-    # Rapport avec seuil optimisé
-    print(f"\n--- Seuil optimisé ({optimal_threshold:.4f}) ---")
+    # Rapport avec seuil optimisé sur validation
+    print(f"\n--- Seuil optimisé sur validation ({optimal_threshold:.4f}) ---")
     print(classification_report(y_eval, y_pred_optimized))
 
     # Métriques clés pour la détection de fraude
@@ -154,6 +186,8 @@ def train_model():
         'features': features,
         'numeric_features': numeric_features,
         'threshold': optimal_threshold,
+        'client_stats': client_stats.set_index('client_id'),    # lookup à l'inférence
+        'merchant_stats': merchant_stats.set_index('merchant_id'),  # lookup à l'inférence
     }
     joblib.dump(artifacts, model_path)
     print(f"Modèle sauvegardé dans {model_path} (seuil : {optimal_threshold:.4f})")

@@ -26,6 +26,27 @@ def predict_fraud(df_transaction, artifacts):
     df['hour'] = df['timestamp'].dt.hour
     df['day_of_week'] = df['timestamp'].dt.dayofweek
 
+    # Features comportementales : lookup dans les stats calculées à l'entraînement
+    client_stats = artifacts.get('client_stats')
+    merchant_stats = artifacts.get('merchant_stats')
+
+    if client_stats is not None:
+        default_tx_count = client_stats['client_tx_count'].median()
+        default_avg_amount = client_stats['client_avg_amount'].median()
+        df['client_tx_count'] = df['client_id'].map(
+            client_stats['client_tx_count']
+        ).fillna(default_tx_count)
+        df['client_avg_amount'] = df['client_id'].map(
+            client_stats['client_avg_amount']
+        ).fillna(default_avg_amount)
+        df['client_amount_ratio'] = df['amount'] / (df['client_avg_amount'] + 1e-6)
+
+    if merchant_stats is not None:
+        default_merchant_count = merchant_stats['merchant_tx_count'].median()
+        df['merchant_tx_count'] = df['merchant_id'].map(
+            merchant_stats['merchant_tx_count']
+        ).fillna(default_merchant_count)
+
     features = artifacts['features']
     X = df[features].copy()
 

@@ -168,7 +168,7 @@ with col_title:
     st.markdown("# Delay Forecast — Monitoring")
 with col_refresh:
     st.markdown("<div style='margin-top:12px'>", unsafe_allow_html=True)
-    if st.button("Rafraichir", use_container_width=True):
+    if st.button("Rafraîchir", use_container_width=True):
         st.cache_data.clear()
         st.rerun()
     st.markdown("</div>", unsafe_allow_html=True)
@@ -210,16 +210,16 @@ if df.empty:
             st.metric("—", "N/A")
 else:
     with m1:
-        st.metric("Total predictions", f"{len(df):,}")
+        st.metric("Total prédictions", f"{len(df):,}")
     with m2:
         if "timestamp" in df.columns:
             today = df[df["timestamp"] >= pd.Timestamp.utcnow().replace(tzinfo=None).normalize()]
-            st.metric("Predictions aujourd'hui", len(today))
+            st.metric("Prédictions aujourd'hui", len(today))
         else:
-            st.metric("Predictions aujourd'hui", "—")
+            st.metric("Prédictions aujourd'hui", "—")
     with m3:
         if "prediction_P50" in df.columns:
-            st.metric("Retard median P50", f"{df['prediction_P50'].mean():.1f}s")
+            st.metric("Retard médian P50", f"{df['prediction_P50'].mean():.1f}s")
         else:
             st.metric("Retard median P50", "—")
     with m4:
@@ -235,7 +235,7 @@ st.markdown("<hr>", unsafe_allow_html=True)
 # ─────────────────────────────────────────────
 # SECTION 2 — PREDICTION LIVE
 # ─────────────────────────────────────────────
-st.markdown("### Prediction live")
+st.markdown("### Prédiction live")
 
 api_ok, _ = check_service(API_URL, "/")
 if not api_ok:
@@ -256,10 +256,10 @@ else:
                 index=datetime.now().weekday(),
             )
         with fc3:
-            bus_nbr        = st.text_input("Numero de bus", value="541")
-            stop_sequence  = st.number_input("Sequence d'arret", min_value=1, max_value=50, value=1)
+            bus_nbr        = st.text_input("Numéro de bus", value="541")
+            stop_sequence  = st.number_input("Séquence d'arrêt", min_value=1, max_value=50, value=1)
 
-        submitted = st.form_submit_button("Lancer la prediction", use_container_width=True, type="primary")
+        submitted = st.form_submit_button("Lancer la prédiction", use_container_width=True, type="primary")
 
     if submitted:
         payload = {
@@ -281,22 +281,19 @@ else:
                     res = r.json()
                     p50, p80, p90 = res["prediction_P50"], res["prediction_P80"], res["prediction_P90"]
 
-                    st.markdown(f"<small style='color:{MUTED}'>Reponse en {latency:.0f}ms</small>", unsafe_allow_html=True)
+                    st.markdown(f"<small style='color:{MUTED}'>Réponse en {latency:.0f}ms</small>", unsafe_allow_html=True)
 
                     rc1, rc2, rc3 = st.columns(3)
                     for col, label, val, delta_base in [
-                        (rc1, "P50 — Mediane",    p50, None),
+                        (rc1, "P50 — Médiane",    p50, None),
                         (rc2, "P80 — Pessimiste", p80, p50),
-                        (rc3, "P90 — Extreme",    p90, p50),
+                        (rc3, "P90 — Extrême",    p90, p50),
                     ]:
                         with col:
                             delta_str = f"+{val - delta_base:.1f}s vs P50" if delta_base else None
+                            delta_html = f"<div style='font-size:0.82rem;color:{MUTED}'>{delta_str}</div>" if delta_str else ""
                             st.markdown(
-                                f"""<div class="pred-card">
-                                <div class="pred-label">{label}</div>
-                                <div class="pred-val">{val:.1f}s</div>
-                                {"<div style='font-size:0.82rem;color:"+MUTED+"'>"+delta_str+"</div>" if delta_str else ""}
-                                </div>""",
+                                f"<div class=\"pred-card\"><div class=\"pred-label\">{label}</div><div class=\"pred-val\">{val:.1f}s</div>{delta_html}</div>",
                                 unsafe_allow_html=True,
                             )
 
@@ -308,7 +305,7 @@ else:
                         textposition="outside",
                     ))
                     fig_pred.update_layout(
-                        title="Retard predit par quantile (secondes)",
+                        title="Retard prédit par quantile (secondes)",
                         yaxis_title="Retard (s)",
                         showlegend=False,
                         height=320,
@@ -325,12 +322,12 @@ st.markdown("<hr>", unsafe_allow_html=True)
 # ─────────────────────────────────────────────
 # SECTION 3 — GRAPHIQUES
 # ─────────────────────────────────────────────
-st.markdown("### Analyse des predictions")
+st.markdown("### Analyse des prédictions")
 
 if df.empty:
-    st.info("Aucune donnee disponible (base de donnees non accessible).")
+    st.info("Aucune donnée disponible (base de données non accessible).")
 else:
-    n_show = st.slider("Nombre de predictions a afficher", 50, 1000, 200, step=50, key="chart_n")
+    n_show = st.slider("Nombre de prédictions à afficher", 50, 1000, 200, step=50, key="chart_n")
     df_view = df.head(n_show).copy()
 
     # Row 1 — activity + quantile distributions
@@ -343,10 +340,10 @@ else:
             activity = df_hourly.groupby("heure").size().reset_index(name="predictions")
             fig_act = px.bar(
                 activity, x="heure", y="predictions",
-                title="Activite par heure",
+                title="Activité par heure",
                 color_discrete_sequence=[TEAL],
             )
-            fig_act.update_layout(xaxis_title="", yaxis_title="Nb predictions", height=320)
+            fig_act.update_layout(xaxis_title="", yaxis_title="Nb prédictions", height=320)
             st.plotly_chart(plotly_defaults(fig_act), use_container_width=True)
         else:
             st.info("Pas de timestamp disponible.")
@@ -355,12 +352,12 @@ else:
         quant_cols = [c for c in ["prediction_P50", "prediction_P80", "prediction_P90"] if c in df_view.columns]
         if quant_cols:
             fig_dist = go.Figure()
-            colors = [TEAL, TEAL2, "#0f766e"]
+            colors = [TEAL, "#f59e0b", "#f87171"]
             for col, color in zip(quant_cols, colors):
                 fig_dist.add_trace(go.Histogram(
                     x=df_view[col].dropna(),
                     name=col.replace("prediction_", ""),
-                    opacity=0.7,
+                    opacity=0.65,
                     marker_color=color,
                     nbinsx=30,
                 ))
@@ -368,9 +365,9 @@ else:
                 title="Distribution des quantiles de retard",
                 barmode="overlay",
                 xaxis_title="Retard (s)",
-                yaxis_title="Frequence",
+                yaxis_title="Fréquence",
                 height=320,
-                legend=dict(orientation="h", y=1.1),
+                legend=dict(orientation="v", x=1.02, y=1, xanchor="left"),
             )
             st.plotly_chart(plotly_defaults(fig_dist), use_container_width=True)
 
@@ -384,7 +381,7 @@ else:
             mae_by_hour = gt_df.groupby("hour")["mae"].mean().reset_index()
             fig_mae = px.bar(
                 mae_by_hour, x="hour", y="mae",
-                title="MAE par heure de la journee",
+                title="MAE par heure de la journée",
                 labels={"hour": "Heure", "mae": "MAE (s)"},
                 color_discrete_sequence=[TEAL],
             )
@@ -418,155 +415,102 @@ else:
 st.markdown("<hr>", unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────
-# SECTION 4 — EVIDENTLY
+# SECTION 4 — DRIFT MONITORING
 # ─────────────────────────────────────────────
-st.markdown("### Evidently — Drift & Qualite")
+st.markdown("### Drift — dernière run hebdomadaire")
 
-ev_ok, _ = check_service(EVIDENTLY_URL, "/health")
-if not ev_ok:
-    st.error("Service Evidently non disponible.")
+engine = get_db_engine()
+if engine is None:
+    st.warning("Base de données non accessible.")
 else:
-    # ── Colonnes features utilisées pour le drift ──────────────────────────
-    DRIFT_FEATURE_COLS = [
-        "direction_id", "month", "day", "hour", "day_of_week", "stop_sequence",
-        "temperature_2m", "precipitation", "rain", "snowfall", "cloud_cover",
-        "wind_speed_10m", "wind_gusts_10m", "est_weekend", "est_jour_ferie",
-        "vacances_scolaires", "risque_gel_pluie", "risque_gel_neige",
-    ]
-
-    def df_to_evidently_payload(dataframe: pd.DataFrame) -> list[dict]:
-        cols = [c for c in DRIFT_FEATURE_COLS if c in dataframe.columns]
-        return dataframe[cols].dropna().to_dict(orient="records")
-
-    # ── Statut reference ───────────────────────────────────────────────────
     try:
-        ref = requests.get(f"{EVIDENTLY_URL}/reference/status", timeout=5).json()
-        ref_is_set = ref.get("status") == "set"
-    except Exception:
-        ref = {}
-        ref_is_set = False
+        df_drift = pd.read_sql(
+            """
+            SELECT
+                p."prediction_P50",
+                g.actual_delay,
+                g.created_at
+            FROM prediction_logs p
+            JOIN ground_truth g ON g.prediction_log_id = p.id
+            WHERE p.bus_nbr = '541'
+            ORDER BY g.created_at DESC
+            """,
+            engine,
+        )
+    except Exception as e:
+        st.error(f"Erreur DB : {e}")
+        df_drift = pd.DataFrame()
 
-    if ref_is_set:
-        st.success(f"✔ Donnees de reference definies — {ref.get('rows', '?')} lignes, {len(ref.get('columns', []))} colonnes")
+    if df_drift.empty:
+        st.info("Aucune donnée de ground truth disponible. Lancez le DAG weekly_drift_detector.")
     else:
-        st.warning("Aucune donnee de reference en memoire. Definissez-en une ci-dessous (perdu au redemarrage du conteneur).")
+        df_drift["created_at"] = pd.to_datetime(df_drift["created_at"])
+        last_run_date = df_drift["created_at"].max()
 
-    # ── Definir les donnees de reference ──────────────────────────────────
-    with st.expander("Definir les donnees de reference depuis la base de donnees"):
-        ref_n = st.slider("Nombre de predictions historiques a utiliser comme reference", 100, 2000, 500, step=100)
-        if st.button("Charger et definir comme reference", use_container_width=True):
-            df_ref_src = load_prediction_logs(ref_n * 2)  # charge plus, prend la moitie la plus ancienne
-            if df_ref_src.empty:
-                st.error("Impossible de charger les donnees depuis la base.")
+        # Données de la dernière run (insérée dans les dernières 24h par le DAG)
+        df_last = df_drift[df_drift["created_at"] >= last_run_date - pd.Timedelta(hours=1)]
+        df_all  = df_drift
+
+        mae_weekly = (df_last["prediction_P50"] - df_last["actual_delay"]).abs().mean()
+        mae_global = (df_all["prediction_P50"]  - df_all["actual_delay"]).abs().mean()
+        drift_ratio = mae_weekly / mae_global if mae_global else None
+        alert_sent = drift_ratio is not None and drift_ratio > 1.3
+
+        # ── Indicateurs ──────────────────────────────────────────────────
+        ind1, ind2, ind3, ind4 = st.columns(4)
+        with ind1:
+            st.metric("MAE hebdo (dernière run)", f"{mae_weekly:.1f}s")
+        with ind2:
+            st.metric("MAE globale (référence)", f"{mae_global:.1f}s")
+        with ind3:
+            color = "#f87171" if alert_sent else TEAL
+            ratio_label = f"{drift_ratio:.2f}" if drift_ratio else "—"
+            st.markdown(
+                f"<div style='font-size:0.82rem;color:{MUTED};margin-bottom:4px'>Drift ratio</div>"
+                f"<div style='font-size:1.6rem;font-weight:700;color:{color}'>{ratio_label}</div>"
+                f"<div style='font-size:0.75rem;color:{MUTED}'>seuil : 1.30</div>",
+                unsafe_allow_html=True,
+            )
+        with ind4:
+            if alert_sent:
+                st.markdown(
+                    f"<div style='font-size:0.82rem;color:{MUTED};margin-bottom:4px'>Alerte email</div>"
+                    f"<div style='font-size:1.1rem;font-weight:700;color:#f87171'>✘ Mail envoyé</div>"
+                    f"<div style='font-size:0.75rem;color:{MUTED}'>drift > 30%</div>",
+                    unsafe_allow_html=True,
+                )
             else:
-                df_ref_data = df_ref_src.tail(ref_n)  # les plus anciennes = reference
-                payload_ref = df_to_evidently_payload(df_ref_data)
-                if not payload_ref:
-                    st.error("Aucune colonne compatible trouvee dans la base.")
-                else:
-                    try:
-                        r = requests.post(f"{EVIDENTLY_URL}/reference", json={"data": payload_ref}, timeout=15)
-                        if r.status_code == 200:
-                            st.success(f"✔ Reference definie — {len(payload_ref)} lignes")
-                            st.cache_data.clear()
-                            st.rerun()
-                        else:
-                            st.error(f"Erreur : {r.text}")
-                    except Exception as e:
-                        st.error(str(e))
+                st.markdown(
+                    f"<div style='font-size:0.82rem;color:{MUTED};margin-bottom:4px'>Alerte email</div>"
+                    f"<div style='font-size:1.1rem;font-weight:700;color:{TEAL}'>✔ Aucune alerte</div>"
+                    f"<div style='font-size:0.75rem;color:{MUTED}'>drift normal</div>",
+                    unsafe_allow_html=True,
+                )
 
-    # ── Actions ────────────────────────────────────────────────────────────
-    act1, act2, act3 = st.columns(3)
+        st.markdown(f"<small style='color:{MUTED}'>Dernière run : {last_run_date.strftime('%Y-%m-%d %H:%M UTC')} — {len(df_last)} lignes matchées</small>", unsafe_allow_html=True)
 
-    def get_current_data_payload(n: int = 200) -> list[dict] | None:
-        df_cur = load_prediction_logs(n)
-        if df_cur.empty:
-            return None
-        return df_to_evidently_payload(df_cur.head(n))
-
-    with act1:
-        if st.button("Generer rapport de drift", use_container_width=True, disabled=not ref_is_set):
-            data = get_current_data_payload()
-            if not data:
-                st.error("Pas de donnees courantes disponibles.")
-            else:
-                with st.spinner("Generation en cours..."):
-                    try:
-                        r = requests.post(f"{EVIDENTLY_URL}/drift/report", json={"data": data}, timeout=30)
-                        if r.status_code == 200:
-                            res = r.json()
-                            if res.get("drift_detected"):
-                                st.error(f"✘ Drift detecte — {res.get('drift_share', 0):.1%} (seuil : {res.get('threshold', 0):.1%})")
-                            else:
-                                st.success(f"✔ Pas de drift — {res.get('drift_share', 0):.1%}")
-                            st.cache_data.clear()
-                        else:
-                            st.error(r.text)
-                    except Exception as e:
-                        st.error(str(e))
-
-    with act2:
-        if st.button("Generer rapport de qualite", use_container_width=True):
-            data = get_current_data_payload()
-            if not data:
-                st.error("Pas de donnees courantes disponibles.")
-            else:
-                with st.spinner("Generation en cours..."):
-                    try:
-                        r = requests.post(f"{EVIDENTLY_URL}/quality/report", json={"data": data}, timeout=30)
-                        if r.status_code == 200:
-                            st.success(f"✔ {r.json().get('report_filename', 'Rapport genere')}")
-                            st.cache_data.clear()
-                        else:
-                            st.error(r.text)
-                    except Exception as e:
-                        st.error(str(e))
-
-    with act3:
-        if st.button("Lancer les tests de drift", use_container_width=True, disabled=not ref_is_set):
-            data = get_current_data_payload()
-            if not data:
-                st.error("Pas de donnees courantes disponibles.")
-            else:
-                with st.spinner("Tests en cours..."):
-                    try:
-                        r = requests.post(f"{EVIDENTLY_URL}/drift/test", json={"data": data}, timeout=30)
-                        if r.status_code == 200:
-                            res = r.json()
-                            if res.get("all_tests_passed"):
-                                st.success("✔ Tous les tests ont passe")
-                            else:
-                                st.error("✘ Certains tests ont echoue")
-                            st.cache_data.clear()
-                        else:
-                            st.error(r.text)
-                    except Exception as e:
-                        st.error(str(e))
-
-    # Report viewer
-    reports = get_evidently_reports()
-    reports_list = reports if isinstance(reports, list) else reports.get("reports", [])
-    # /reports renvoie une liste de dicts {filename, created_at, size_kb}
-    # on normalise pour obtenir une liste de dicts dans tous les cas
-    if reports_list and isinstance(reports_list[0], str):
-        reports_list = [{"filename": f, "created_at": "", "size_kb": 0} for f in reports_list]
-
-    if reports_list:
-        st.markdown(f"<small style='color:{MUTED}'>{len(reports_list)} rapport(s) disponible(s)</small>", unsafe_allow_html=True)
-        options = {
-            f"{r['filename']}  ({r.get('created_at','')[:19]}  —  {r.get('size_kb',0):.0f} KB)": r["filename"]
-            for r in reversed(reports_list)
-        }
-        selected_label = st.selectbox("Visualiser un rapport", ["— Choisir —"] + list(options.keys()))
-        if selected_label and selected_label != "— Choisir —":
-            filename = options[selected_label]
-            # lien cliquable pour l'utilisateur (URL hôte, pas Docker interne)
-            st.markdown(f"[Ouvrir dans un nouvel onglet](http://localhost:8001/reports/{filename})")
-            try:
-                # fetch server-side (EVIDENTLY_URL interne Docker accessible depuis Streamlit)
-                html_content = requests.get(f"{EVIDENTLY_URL}/reports/{filename}", timeout=15).text
-                st.components.v1.html(html_content, height=750, scrolling=True)
-            except Exception as e:
-                st.error(f"Impossible de charger le rapport : {e}")
-    else:
-        st.info("Aucun rapport disponible. Generez-en un ci-dessus.")
+        # ── Distribution P50 prédit vs retard réel ───────────────────────
+        fig_dist = go.Figure()
+        fig_dist.add_trace(go.Histogram(
+            x=df_last["prediction_P50"].dropna(),
+            name="P50 prédit",
+            opacity=0.7,
+            marker_color=TEAL,
+            nbinsx=30,
+        ))
+        fig_dist.add_trace(go.Histogram(
+            x=df_last["actual_delay"].dropna(),
+            name="Retard réel",
+            opacity=0.7,
+            marker_color="#f87171",
+            nbinsx=30,
+        ))
+        fig_dist.update_layout(
+            title="Distribution P50 prédit vs Retard réel (dernière run)",
+            barmode="overlay",
+            xaxis_title="Retard (s)",
+            yaxis_title="Fréquence",
+            height=340,
+            legend=dict(orientation="v", x=1.02, y=1, xanchor="left"),
+        )
+        st.plotly_chart(plotly_defaults(fig_dist), use_container_width=True)

@@ -29,19 +29,20 @@ def drift_monitoring():
         sync_query = """
         INSERT INTO ground_truth (prediction_log_id, actual_delay, created_at)
         SELECT DISTINCT ON (p.id)
-            p.id, 
+            p.id,
             r.departure_delay,
             NOW()
         FROM prediction_logs p
-        JOIN stg_transport_realtime r ON 
-            p.bus_nbr::text = r.bus_nbr::text 
-            AND p.direction_id::text = r.direction_id::text 
+        JOIN stg_transport_archive r ON
+            p.bus_nbr::text = r.bus_nbr::text
+            AND p.direction_id::text = r.direction_id::text
             AND p.stop_sequence::int = r.stop_sequence::int
-            -- Matching structurel sur le temps
-            AND p.month = EXTRACT(MONTH FROM r.timestamp_rounded)
-            AND p.day_of_week = EXTRACT(DOW FROM r.timestamp_rounded)
+            -- Matching structurel : même créneau horaire et même profil temporel
+            -- MOD(...+6,7) convertit le DOW PostgreSQL (0=dim) en convention Python (0=lun)
+            AND p.day_of_week = MOD(EXTRACT(DOW FROM r.timestamp_rounded)::int + 6, 7)
             AND p.hour = EXTRACT(HOUR FROM r.timestamp_rounded)
         WHERE p.bus_nbr = '541'
+          AND p.day_of_week BETWEEN 0 AND 6
           AND NOT EXISTS (
               SELECT 1 FROM ground_truth g WHERE g.prediction_log_id = p.id
           )

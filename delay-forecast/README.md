@@ -21,27 +21,16 @@ Le projet couvre l'ensemble du cycle de vie Machine Learning :
 
 ## :brain: Flux global du projet
 
-```text
-         Appels API
-            ↓
-   Stockage données brutes
-            (S3)
-            ↓
-        Airflow DAG
-     (ingestion / ETL)
-            ↓
-     PostgreSQL (Neon)
-            ↓
-     Entraînement ML
-      (MLflow tracking)
-            ↓
-      Modèles + métriques
-            ↓
-     API FastAPI → Prédictions
-            ↓
-      Monitoring (Evidently)
-       Détection de drift
-
+```mermaid
+flowchart TD
+    A[Appels API\nKöDa · Open-Meteo] --> B[(Stockage données brutes\nAWS S3)]
+    B --> C[Airflow DAG\nIngestion · ETL]
+    C --> D[(PostgreSQL\nNeon)]
+    D --> E[Entraînement ML\nMLflow tracking]
+    E --> F[Modèles + métriques\nP50 · P80 · P90]
+    F --> G[API FastAPI\nPrédictions]
+    G --> H[Monitoring\nEvidently · Détection de drift]
+    H -->|Drift détecté| C
 ```
 
 ## :building_construction: Architecture globale
