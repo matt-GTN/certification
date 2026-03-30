@@ -39,23 +39,20 @@ def ingest_weather_forecast():
     cur = conn.cursor()
 
     insert_query = """
-        INSERT INTO stg_weather_forecast (time, temperature_2m, precipitation, rain, snowfall, wind_speed_10m, cloud_cover, dew_point_2m)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        ON CONFLICT (time) DO UPDATE SET
-            temperature_2m = EXCLUDED.temperature_2m,
-            precipitation = EXCLUDED.precipitation,
-            rain = EXCLUDED.rain,
-            snowfall = EXCLUDED.snowfall,
-            wind_speed_10m = EXCLUDED.wind_speed_10m,
-            cloud_cover = EXCLUDED.cloud_cover,
-            dew_point_2m = EXCLUDED.dew_point_2m;
+        INSERT INTO stg_weather_forecast (timestamp_rounded, temperature_2m, precipitation, rain, snowfall, wind_speed_10m, cloud_cover, dew_point_2m)
+        SELECT %s, %s, %s, %s, %s, %s, %s, %s
+        WHERE NOT EXISTS (
+            SELECT 1 FROM stg_weather_forecast
+            WHERE timestamp_rounded = %s
+        );
     """
 
     for _, row in df.iterrows():
+        ts = row["time"]
         cur.execute(insert_query, (
-            row["time"], row["temperature_2m"], row["precipitation"],
+            ts, row["temperature_2m"], row["precipitation"],
             row["rain"], row["snowfall"], row["wind_speed_10m"],
-            row["cloud_cover"], row["dew_point_2m"],
+            row["cloud_cover"], row["dew_point_2m"], ts,
         ))
 
     conn.commit()
@@ -100,9 +97,9 @@ def check_data_freshness():
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT COUNT(*), MAX(time)
+        SELECT COUNT(*), MAX(timestamp_rounded)
         FROM stg_weather_forecast
-        WHERE time >= NOW() - INTERVAL '24 hours';
+        WHERE timestamp_rounded >= NOW() - INTERVAL '24 hours';
     """)
     count, latest = cur.fetchone()
     logger.info("Données météo récentes : %d lignes, dernière : %s", count, latest)
