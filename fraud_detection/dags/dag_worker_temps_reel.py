@@ -7,7 +7,7 @@ Planifié toutes les minutes pour simuler le flux temps réel.
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from datetime import datetime
+from datetime import datetime, timedelta
 import sys
 import os
 import random
@@ -54,7 +54,7 @@ def traiter_transactions_batch(n_transactions=5):
             # 3. Sauvegarde de la prédiction
             pred_data = {
                 'transaction_id': df_new['transaction_id'].values[0],
-                'model_version': 'tabpfn-v2',
+                'model_version': 'lgbm-xgb-ensemble-v1',
                 'prediction_score': score,
                 'is_alerted': is_fraud
             }
@@ -76,7 +76,7 @@ with DAG(
     dag_id='worker_temps_reel',
     default_args=default_args,
     description='Ingestion et prédiction temps réel des transactions',
-    schedule_interval='*/1 * * * *',  # Toutes les minutes
+    schedule_interval=timedelta(seconds=10),  # Toutes les 10 secondes
     start_date=datetime(2024, 1, 1),
     catchup=False,
     max_active_runs=1,  # Éviter les exécutions concurrentes

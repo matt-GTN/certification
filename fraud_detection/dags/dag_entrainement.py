@@ -1,5 +1,5 @@
 """
-DAG Airflow : Entraînement du modèle TabPFN v2.
+DAG Airflow : Entraînement du duo de modèles d'ensemble.
 Ré-entraîne le modèle de détection de fraude sur les données historiques.
 Planifié hebdomadairement pour intégrer les nouvelles données labellisées.
 """
@@ -22,15 +22,15 @@ default_args = {
 with DAG(
     dag_id='entrainement_modele',
     default_args=default_args,
-    description='Entraîne le modèle TabPFN v2 de détection de fraude',
+    description='Entraîne le duo de modèles de détection de fraude',
     schedule_interval='@weekly',  # Ré-entraînement hebdomadaire
     start_date=datetime(2024, 1, 1),
     catchup=False,
-    tags=['ml', 'entrainement', 'tabpfn'],
+    tags=['ml', 'entrainement', 'model_duo'],
 ) as dag:
 
     tache_entrainement = PythonOperator(
-        task_id='entrainer_modele_tabpfn',
+        task_id='entrainer_model_duo',
         python_callable=train_model,
     )
 

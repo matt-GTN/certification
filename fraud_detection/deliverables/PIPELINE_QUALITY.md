@@ -11,6 +11,11 @@ Le pipeline intègre des mécanismes de validation à chaque étape pour garanti
 *   **Conversion de types** : Conversion forcée des types (ex : timestamp en `datetime`, montants en `float`) pour éviter les erreurs de calcul en aval.
 *   **Orchestration** : Airflow détecte et relance automatiquement les tâches échouées (retries configurables par DAG).
 
+### Évaluation du modèle
+*   **Jeux de validation et test stratifiés** : La séparation train/val/test (80/10/10) conserve le taux de fraude réel (≈ 0,38 %) dans chaque split. Le jeu de test final contient 214 fraudes — suffisant pour que les métriques (recall, précision, AUC-PR) soient statistiquement fiables.
+*   **Optimisation du seuil sans leakage** : Le seuil de décision est optimisé sur le jeu de validation (215 fraudes), puis évalué sur le jeu de test (214 fraudes) pour éviter tout surapprentissage du seuil.
+*   **Guard F2** : Si le seuil optimisé dégrade le F2-score (β=2, favorise le recall) par rapport au seuil neutre 0.5, le pipeline revient automatiquement à 0.5 — garantissant qu'une optimisation mal contrainte ne peut pas régresser les performances en production.
+
 ### Transformation (Ingénierie des features)
 *   **Gestion des valeurs manquantes** : Le pipeline de prédiction vérifie l'absence de valeurs nulles sur les features critiques (`amount`, `category`).
 *   **Référentiel temporel** : Synchronisation de l'heure système avec l'heure de la transaction pour garantir la cohérence des features temporelles (`hour`, `day_of_week`).
@@ -33,7 +38,7 @@ Le tableau de bord fournit une vue consolidée de la "santé" des données :
 *   **Volume de transactions** : Permet de vérifier que le pipeline d'ingestion ne subit pas d'interruption (baisse de cadence).
 
 ### Monitoring technique (Logs et alertes)
-*   **Traçage des prédictions** : Chaque prédiction est enregistrée dans la table `predictions` de **Neon PostgreSQL** avec la version du modèle utilisée (`tabpfn-v2`), permettant un audit a posteriori en cas de faux positifs.
+*   **Traçage des prédictions** : Chaque prédiction est enregistrée dans la table `predictions` de **Neon PostgreSQL** avec la version du modèle utilisée (`lgbm-xgb-ensemble-v1`), permettant un audit a posteriori en cas de faux positifs.
 *   **Logs Airflow** : Les détections de fraude sont journalisées dans les logs de chaque exécution de DAG, accessibles via l'interface web.
 
 ## 3. Gestion des erreurs et reprise (Error Correction)
@@ -46,7 +51,7 @@ Le tableau de bord fournit une vue consolidée de la "santé" des données :
 ## 4. Reporting et traçabilité
 
 *   **Rapport quotidien automatisé** : Le DAG `rapport_quotidien` génère chaque matin un fichier CSV contenant toutes les transactions et fraudes de la veille, archivé dans `data/rapports/`.
-*   **Versionnement du modèle** : Chaque prédiction est associée à la version du modèle (`tabpfn-v2`), permettant de tracer l'évolution des performances.
+*   **Versionnement du modèle** : Chaque prédiction est associée à la version du modèle (`lgbm-xgb-ensemble-v1`), permettant de tracer l'évolution des performances.
 *   **Historique complet** : L'interface Airflow conserve l'historique de toutes les exécutions, offrant une vue d'ensemble de la fiabilité du pipeline.
 
 ## 5. Conformité à la gouvernance

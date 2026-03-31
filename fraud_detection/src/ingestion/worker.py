@@ -62,7 +62,7 @@ def run_worker(filepath, interval=5):
             # 3. Sauvegarde de la prédiction
             pred_data = {
                 'transaction_id': df_new['transaction_id'].values[0],
-                'model_version': 'tabpfn-v2',
+                'model_version': 'lgbm-xgb-ensemble-v1',
                 'prediction_score': score,
                 'is_alerted': is_fraud
             }

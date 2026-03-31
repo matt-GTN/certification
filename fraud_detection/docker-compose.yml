@@ -2,7 +2,7 @@ x-airflow-common: &airflow-common
   build: .
   environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
-    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AIRFLOW_DB_URL}
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
     AIRFLOW__CORE__FERNET_KEY: ''
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'false'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
@@ -19,6 +19,21 @@ x-airflow-common: &airflow-common
     - ./database:/opt/airflow/database
 
 services:
+  airflow-db:
+    image: postgres:15-alpine
+    container_name: airflow_db
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - airflow-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      retries: 5
+    restart: always
+
   airflow-init:
     <<: *airflow-common
     container_name: airflow_init
@@ -35,6 +50,9 @@ services:
           --role Admin \
           --email admin@example.com || true
     restart: "no"
+    depends_on:
+      airflow-db:
+        condition: service_healthy
 
   airflow-webserver:
     <<: *airflow-common
@@ -66,3 +84,6 @@ services:
     ports:
       - "8501:8501"
     restart: always
+
+volumes:
+  airflow-db-data:

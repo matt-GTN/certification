@@ -2,9 +2,8 @@ pandas
 sqlalchemy
 psycopg2-binary
 scikit-learn
-imbalanced-learn
-tabpfn
-tabpfn-client
+lightgbm
+xgboost
 apache-airflow==2.8.1
 streamlit
 requests

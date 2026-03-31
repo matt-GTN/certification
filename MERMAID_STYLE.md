@@ -11,13 +11,13 @@
 
 ## Flèches
 
-| Type | Syntaxe | Usage |
-|------|---------|-------|
-| Épaisse | `==>` | Flux principal |
-| Épaisse + label | `== label ==>` | Flux principal annoté |
-| Pointillée | `-.->` | Rétroaction, flux secondaire |
-| Pointillée + label | `-.->|label|` | Flux secondaire annoté |
-| Neutre | `---` | Lien sans direction |
+| Type               | Syntaxe        | Usage                        |
+| ------------------ | -------------- | ---------------------------- |
+| Épaisse            | `==>`          | Flux principal               |
+| Épaisse + label    | `== label ==>` | Flux principal annoté        |
+| Pointillée         | `-.->`         | Rétroaction, flux secondaire |
+| Pointillée + label | `-.->          | label                        |
+| Neutre             | `---`          | Lien sans direction          |
 
 ## Bloc à copier
 
