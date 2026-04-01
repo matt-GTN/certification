@@ -25,7 +25,7 @@ certification/
 
 Conception et pilotage d'un framework de Data Governance pour Spotify, couvrant la conformité GDPR/CCPA/PCI-DSS, la qualité des données et l'efficacité opérationnelle.
 
-**Livrables** : Plan unique de gouvernance, rôles et responsabilités, et implémentation
+**Livrables** : Plan unique de gouvernance, slides de présentation, rôles et responsabilités, et implémentation
 
 → [Voir le projet](spotify/)
 
@@ -43,11 +43,13 @@ Conception d'une architecture de données intégrant des systèmes OLTP, OLAP et
 
 ### Bloc 3 - Pipelines de données : Fraud Detection
 
-Infrastructure complète de détection de fraude en temps réel, utilisant **TabPFN v2** (Prior Labs) comme modèle de classification et **Apache Airflow** comme orchestrateur.
+Infrastructure complète de détection de fraude en temps réel, utilisant un ensemble de soft-voting comme modèle de classification et **Apache Airflow** comme orchestrateur.
 
-**Stack** : Python, Docker, Airflow, Neon PostgreSQL, Streamlit, TabPFN v2
+**Stack** : Python, Docker, Airflow, Neon PostgreSQL, Streamlit, ensemble LightGBM + XGBoost
 
 **Livrables** : Code source, schema d'infrastructure, video de démonstration.
+
+[Démonstration](https://youtu.be/a4j-gr6q8tU)
 
 → [Voir le projet](fraud_detection/)
 
@@ -60,6 +62,8 @@ POC MLOps de prédiction de retards de transports en commun (Stockholm) en fonct
 **Stack** : Python, Docker, Airflow, MLflow, FastAPI, Evidently, Neon PostgreSQL, AWS S3, Streamlit
 
 **Livrables** : Code source, architecture, video de démonstration.
+
+[Démonstration](https://youtu.be/wguotXaYO0Q)
 
 → [Voir le projet](delay-forecast/)
 

@@ -11,7 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'
 from src.utils.db import fetch_data_from_db
 
 st.set_page_config(page_title="Tableau de Bord - Détection de Fraude", page_icon="🕵️", layout="wide")
-st.title("🛡️ Détection de Fraude - Supervision Globale")
+st.title("Détection de Fraude - Supervision Globale")
 st.markdown("Tableau de bord de suivi des transactions et détection de fraude en temps réel.")
 
 st.sidebar.header("Filtres")

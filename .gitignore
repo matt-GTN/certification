@@ -37,7 +37,7 @@ fraud_detection/logs/
 # Archive (documents de travail internes)
 fraud_detection/archive/
 
-Pasted image *.png
+**/Pasted image *.png
 LIVRABLES.md
 PRESENTATION_EXEMPLE.md
 PRESENTATION_FRAUD_DETECTION.md
@@ -132,3 +132,4 @@ fraud_detection/VIDEO_SCRIPT.md
 delay-forecast/VIDEO_SCRIPT.md
 fraud_detection/data/rapports/
 fraud_detection/models/
+demos/
