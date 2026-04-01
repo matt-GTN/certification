@@ -10,7 +10,7 @@ L'ensemble du code ainsi que des livrables est consultable sur le repo github :
 
 Les vidéos de démonstration sont consultables ici : 
 
-[fraud_detection)](https://youtu.be/a4j-gr6q8tU) 
+[fraud_detection](https://youtu.be/a4j-gr6q8tU) 
 
 [delay-forecast](https://youtu.be/wguotXaYO0Q)
 
