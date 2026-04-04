@@ -133,3 +133,8 @@ delay-forecast/VIDEO_SCRIPT.md
 fraud_detection/data/rapports/
 fraud_detection/models/
 demos/
+images/
+delay-forecast/PRESENTATION_DELAY_FORECAST.md
+delay-forecast/distribution_quantiles.png
+delay-forecast/generate_distribution_graph.py
+fraud_detection/deliverables/liens_utiles.md
